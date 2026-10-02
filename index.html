@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SafeNOW v1 Edit</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --primary:#2B5BA8;--primary-d:#234C8E;--primary-l:#EAF1FB;--blue:#1662E8;
+  --navy:#0F1E3A;
+  --bg:#F3F5F8;--line:#E3E7ED;--line-2:#D5DBE3;
+  --text:#1B2433;--sub:#5B6676;--muted:#8A94A3;
+  --ok:#1F8A5B;--ok-l:#E6F5EE;--warn:#B7791F;--warn-l:#FDF4E3;--err:#D14343;--err-l:#FCEBEB;
+  --dark:#262A31;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:Pretendard,-apple-system,"Malgun Gothic",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:260px 1fr;height:100vh}
+/* GNB */
+.gnb{background:var(--navy);color:#C9D3E4;display:flex;flex-direction:column;overflow:auto}
+.gnb-head{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.gnb-head .logo{font-weight:800;font-size:18px;color:#fff;letter-spacing:-.3px}
+.gnb-head .logo b{color:#6FA3FF}
+.gnb-sec{padding:14px 12px 4px}
+.gnb-sec h6{margin:0 8px 8px;font-size:11px;font-weight:600;color:#7F90AE;letter-spacing:.4px}
+.gnb a{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:8px;color:inherit;text-decoration:none;cursor:pointer}
+.gnb a:hover{background:rgba(255,255,255,.06)}
+.gnb a.on{background:var(--primary);color:#fff}
+.gnb a .no{font-size:11px;font-weight:700;background:rgba(255,255,255,.1);border-radius:4px;padding:1px 6px;white-space:nowrap;margin-top:1px}
+.gnb a.on .no{background:rgba(255,255,255,.22)}
+.gnb a .t{font-size:13px;line-height:1.4}
+.gnb a .t small{display:block;font-size:11px;opacity:.7;margin-top:2px}
+.gnb-foot{margin-top:auto;padding:14px 20px;font-size:11px;color:#7F90AE;border-top:1px solid rgba(255,255,255,.08)}
+/* page */
+.main{overflow:auto}
+.page-head{background:#fff;border-bottom:1px solid var(--line);padding:18px 28px 14px;position:sticky;top:0;z-index:20}
+.crumb{font-size:12px;color:var(--muted)}
+.page-head h1{margin:4px 0 4px;font-size:20px;letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
+.meta{display:flex;gap:14px;font-size:12px;color:var(--sub)}
+.body{padding:20px 28px 60px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.b-plan{background:var(--primary-l);color:var(--primary)}
+.b-dev{background:var(--warn-l);color:var(--warn)}
+.b-done{background:var(--ok-l);color:var(--ok)}
+.doc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px 26px;max-width:1100px}
+table.tb{width:100%;border-collapse:collapse;font-size:13px}
+.tb th,.tb td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+.tb th{background:#F7F9FB;font-weight:600;color:var(--sub)}
+.link{color:var(--primary);cursor:pointer;font-weight:600}
+.ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.stat small{color:var(--sub);font-size:12px}
+.stat b{display:block;font-size:26px}
+.stat b span{font-size:12px;color:var(--muted);font-weight:500;margin-left:3px}
+/* description */
+.desc-box{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:14px;font-size:13px;color:#333C4A}
+.desc-box h4{margin:0 0 8px;font-size:14px;color:var(--text)}
+.desc-box .cols{display:grid;grid-template-columns:1fr 1.4fr;gap:28px}
+.desc-box .cols>div+div{border-left:1px solid var(--line);padding-left:28px}
+.desc-box ul,.desc-box ol{margin:0;padding-left:18px}
+.desc-box li{margin:2px 0}
+.desc-box .k{color:var(--primary-d);font-weight:700}
+/* buttons */
+.btn{border:1px solid var(--line-2);background:#fff;border-radius:8px;padding:9px 16px;font-weight:600;display:inline-flex;gap:6px;align-items:center;justify-content:center}
+.btn:hover{background:#F7F9FB}
+.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.blue:hover{background:#0F52C9}
+.btn.dark{background:var(--dark);border-color:var(--dark);color:#fff}
+.btn.dark:hover{background:#111}
+.btn:disabled{cursor:not-allowed;opacity:.45}
+.btn.sm{padding:5px 10px;font-size:12px;border-radius:6px}
+/* proto layout */
+.proto{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+.frame{border:1px solid var(--line-2);border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 4px 18px rgba(15,30,58,.06)}
+.frame-bar{height:34px;background:#EEF1F5;display:flex;align-items:center;gap:6px;padding:0 12px;border-bottom:1px solid var(--line)}
+.frame-bar i{width:10px;height:10px;border-radius:50%;background:#D5DBE3;display:block}
+.frame-bar .url{margin-left:10px;flex:1;background:#fff;border-radius:6px;font-size:12px;color:var(--sub);padding:3px 10px;white-space:nowrap;overflow:hidden}
+.svc{display:grid;grid-template-columns:200px 1fr;min-height:780px;background:#F2F4F7;position:relative}
+.svc-side{background:#fff;border-right:1px solid var(--line);padding:18px 0;font-size:13px}
+.svc-logo{padding:0 20px 14px;font-weight:900;font-size:20px;color:#1D2D5C}
+.svc-side .grp{font-size:12.5px;color:var(--muted);padding:10px 20px 4px}
+.svc-side .grp.on{color:var(--primary);font-weight:700}
+.svc-side .it{padding:7px 20px;color:#39424F}
+.svc-side .it.on{color:var(--primary);font-weight:700;border-right:3px solid var(--primary);background:#F5F8FD}
+.svc-main{padding:24px 26px;min-width:0}
+.svc-title{font-size:20px;font-weight:800;color:var(--primary);margin:0 0 16px}
+.svc-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.search{display:flex;gap:8px;margin-bottom:12px}
+.search input{flex:1;height:42px;border:1px solid var(--line-2);border-radius:8px;padding:0 12px}
+.search button{width:46px;border:0;border-radius:8px;background:var(--dark);color:#fff}
+table.sl{width:100%;border-collapse:collapse;font-size:13px}
+.sl th{background:#F7F8FA;color:#39424F;font-weight:700;padding:12px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.sl td{padding:12px 8px;border-bottom:1px solid #EEF1F4;text-align:center;white-space:nowrap}
+.sl td.l{text-align:left}
+.sl tr.click:hover td{background:#FAFBFD;cursor:pointer}
+.sl tr.flash td{animation:flash 1.6s}
+@keyframes flash{0%{background:#FFF3C4}100%{background:transparent}}
+.comp{display:inline-block;background:#E4EEFF;color:var(--blue);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;margin-right:6px}
+.st{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600}
+.st:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.st.ing{background:#E8F7EE;color:#1E9E5A}
+.st.done{background:#E8F0FD;color:var(--blue)}
+.st.exp{background:#F1F2F4;color:#7A828E}
+.st.no{background:#F1F2F4;color:#7A828E}
+.rtag{display:inline-block;font-size:10.5px;font-weight:700;color:#C2410C;background:#FFF1E6;border-radius:4px;padding:1px 5px;margin-left:4px}
+.ptag{display:inline-block;font-size:10.5px;font-weight:700;color:#7C3AED;background:#F1EAFE;border-radius:4px;padding:1px 6px;margin-left:4px}
+.period small{display:block;color:var(--muted);text-decoration:line-through;font-size:11px}
+.at-btn{width:44px;height:40px;border:1px solid var(--line-2);border-radius:8px;background:#fff;color:var(--blue);display:inline-flex;align-items:center;justify-content:center;position:relative}
+.at-btn:hover{background:#F2F6FE}
+.at-btn:disabled{color:#B9C0CA;cursor:not-allowed;background:#FAFAFB}
+/* modal */
+.dim{position:absolute;inset:0;background:rgba(15,23,42,.45);display:none;align-items:flex-start;justify-content:center;z-index:30;padding:50px 16px;overflow:auto}
+.dim.show{display:flex}
+.modal{background:#fff;border-radius:14px;width:640px;max-width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:24px}
+.modal h3{margin:0 0 4px;font-size:17px}
+.modal .sub{color:var(--sub);font-size:13px;margin:0}
+.m-actions{display:flex;gap:8px;justify-content:center;margin-top:22px}
+.m-actions .btn{min-width:120px;height:46px}
+.lbl{font-size:13px;font-weight:600;margin:16px 0 6px;display:flex;justify-content:space-between;align-items:center}
+.lbl em{color:var(--err);font-style:normal}
+.lbl small{font-weight:400;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 0}
+.seg button{border:1px solid var(--line);background:#F7F8FA;border-radius:8px;height:38px;font-size:13px;color:var(--sub)}
+.seg button.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.seg b{display:inline-block;min-width:18px;border-radius:999px;background:rgba(0,0,0,.08);font-size:11px;margin-left:4px}
+.seg button.on b{background:rgba(255,255,255,.25)}
+table.pt{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+.pt th{padding:10px 6px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-weight:600}
+.pt td{padding:11px 6px;border-bottom:1px solid #EEF1F4;text-align:center}
+.alert{display:flex;gap:10px;align-items:center;border-radius:8px;padding:11px 14px;font-size:13px;margin-top:14px}
+.alert.warn{background:#FFF7E8;border:1px solid #F7DDA8;color:#7A4B00}
+.alert.info{background:#F4F6F9;border:1px solid var(--line);color:var(--sub)}
+.alert .grow{flex:1}
+.url-row{display:flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
+.url-row input{flex:1;border:0;padding:12px 14px;min-width:0;font-size:13px}
+.url-row input:disabled{background:#F4F5F7;color:#9AA1AC;text-decoration:line-through}
+.url-row button{border:0;border-left:1px solid var(--line-2);background:#fff;padding:0 16px;font-weight:600;color:var(--blue);white-space:nowrap}
+.url-row button:disabled{color:#B9C0CA;cursor:not-allowed}
+.hist{width:100%;border-collapse:collapse;font-size:12px}
+.hist th,.hist td{padding:7px 8px;border-bottom:1px solid #EEF1F4;text-align:left}
+.hist th{background:#F7F9FB;color:var(--sub);font-weight:600}
+.box{border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:13px}
+.box .old{color:var(--muted);text-decoration:line-through}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.opts label{border:1px solid var(--line-2);border-radius:8px;padding:8px 6px;text-align:center;font-size:12.5px;cursor:pointer}
+.opts input{display:none}
+.opts label:has(input:checked){border-color:var(--blue);background:#EEF4FF;color:var(--blue);font-weight:700}
+.targets{border:1px solid var(--line-2);border-radius:10px;overflow:hidden;background:#fff}
+.tg-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#F4F7FC;border-bottom:1px solid var(--line)}
+.tg-head label{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;cursor:pointer}
+.tg-head .cnt{font-size:12px;color:var(--sub)}
+.tg-head .cnt b{color:var(--blue)}
+.tg-wrap{position:relative}
+.tg-list{max-height:196px;overflow-y:scroll;padding:4px 0}
+.tg-list::-webkit-scrollbar{width:8px}
+.tg-list::-webkit-scrollbar-track{background:#F1F3F6}
+.tg-list::-webkit-scrollbar-thumb{background:#C3CBD6;border-radius:8px}
+.tg-list label{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:13px;border-bottom:1px solid #F1F3F6}
+.tg-list label:last-child{border-bottom:0}
+.tg-list label.dis{color:var(--muted);background:#FAFBFC}
+.tg-list .ph{margin-left:auto;color:var(--muted);font-size:12px}
+.tg-wrap.more:after{content:"";position:absolute;left:0;right:8px;bottom:0;height:34px;background:linear-gradient(rgba(255,255,255,0),#fff);pointer-events:none}
+select.inp,textarea.inp{width:100%;border:1px solid var(--line-2);border-radius:8px;padding:9px 12px;background:#fff}
+textarea.inp{min-height:64px;resize:vertical;margin-top:6px}
+.dt2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dt{width:100%;height:48px;border:1px solid var(--line-2);border-radius:8px;padding:0 12px;background:#fff;font-size:14px}
+.dt:focus{outline:2px solid #BBD0F0;border-color:var(--blue)}
+.dt.err{border-color:var(--err)}
+.dt-err{color:var(--err);font-size:12px;margin-top:6px}
+/* phone */
+.phone-wrap{position:sticky;top:110px}
+.phone-cap{font-size:12px;color:var(--sub);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.ph-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;width:330px}
+.ph-tabs button{border:1px solid var(--line-2);background:#fff;border-radius:8px;height:34px;font-size:12.5px;color:var(--sub);font-weight:600}
+.ph-tabs button.on{background:var(--dark);border-color:var(--dark);color:#fff}
+.phone{width:330px;height:640px;border-radius:36px;background:#111;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.screen{width:100%;height:100%;border-radius:26px;overflow:hidden;background:#B2C7DA;display:flex;flex-direction:column;position:relative}
+.kk-head{background:#A9BFD3;padding:14px 14px 10px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.kk-head i{width:26px;height:26px;border-radius:9px;background:#1D2D5C;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-style:normal;font-size:11px}
+.kk-body{flex:1;overflow:auto;padding:10px 12px 16px}
+.kk-time{text-align:center;font-size:10.5px;color:#4E5D6C;margin:10px 0 6px}
+.kk-msg{background:#fff;border-radius:4px 14px 14px 14px;overflow:hidden;width:250px;font-size:12px}
+.kk-msg .hd{background:#FEE500;padding:7px 10px;font-weight:700;font-size:11.5px}
+.kk-msg .bd{padding:10px 12px;white-space:pre-wrap;word-break:break-all;line-height:1.55}
+.kk-msg .ft{padding:0 12px 10px}
+.kk-msg .ft button{width:100%;border:0;background:#F2F3F5;border-radius:6px;padding:8px;font-weight:600;font-size:12px}
+.kk-msg .ft small{display:block;color:#98A0AA;font-size:10px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kk-msg.dead{opacity:.75}
+.kk-prev{width:250px;text-align:center;margin-top:8px}
+.kk-prev a{font-size:11.5px;color:#2F3E4E;text-decoration:underline;cursor:pointer}
+.webview{position:absolute;inset:0;background:#fff;display:none;flex-direction:column}
+.webview.show{display:flex}
+.wv-bar{display:flex;align-items:center;gap:8px;padding:12px 12px 10px;border-bottom:1px solid var(--line);font-size:12px}
+.wv-bar button{border:0;background:none;font-size:18px;line-height:1}
+.wv-bar span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.wv-body{flex:1;overflow:auto;padding:18px 16px}
+.wv-body h5{margin:0 0 4px;font-size:16px}
+.wv-body .muted{color:var(--muted);font-size:12px}
+.pad{width:100%;height:170px;border:1.5px dashed var(--line-2);border-radius:10px;touch-action:none;background:#FCFCFD;display:block;margin:10px 0}
+.res{text-align:center;padding-top:60px}
+.res .ic{width:54px;height:54px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800}
+.res .ic.ok{background:var(--ok-l);color:var(--ok)}
+.res .ic.err{background:var(--err-l);color:var(--err)}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:#1B2433;color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.25s;z-index:100;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.hidden{display:none!important}
+@media (max-width:1280px){.proto{grid-template-columns:1fr}.phone-wrap{position:static}}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr;height:auto}
+  .svc{grid-template-columns:1fr}.svc-side{display:none}
+  .ov-grid,.desc-box .cols{grid-template-columns:1fr}
+  .body{padding:16px}.page-head{padding:14px 16px}
+  .svc-card{overflow:auto}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="gnb">
+    <div class="gnb-head"><div class="logo">안전<b>NOW</b> · 수정사항</div></div>
+    <div id="gnbList"></div>
+    <div class="gnb-foot">최종 업데이트 <span id="lastUpdated"></span></div>
+  </nav>
+  <main class="main">
+    <header class="page-head">
+      <div class="crumb" id="crumb"></div>
+      <h1 id="pageTitle"></h1>
+      <div class="meta" id="pageMeta"></div>
+    </header>
+    <section class="body" id="pageBody"></section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- =====================================================================
+     E-001 : 서명관리 – 기간만료 건 알림톡 재발송 시 옴니채널 URL 재발급
+====================================================================== -->
+<template id="tpl-e003">
+  <div class="desc-box">
+    <div class="cols">
+      <div>
+        <h4>AS-IS · 기존 문제</h4>
+        <ul>
+          <li>서명 가능 기간이 지나면 옴니채널 URL이 만료되어 <b>미서명자가 서명할 방법이 없음</b></li>
+          <li>알림톡을 재발송해도 <b>만료된 기존 URL</b>이 그대로 발송되어 서명 불가</li>
+          <li>결국 서명 건을 새로 만들거나 미서명 상태로 남아 <b>서명 누락</b> 발생</li>
+        </ul>
+      </div>
+      <div>
+        <h4>TO-BE · 개선 내용</h4>
+        <ul>
+          <li><span class="k">URL 재발급 및 재발송</span>: 기간만료 건의 알림톡 버튼을 누르면 새 옴니채널 URL을 발급하고 미서명자에게 바로 재발송</li>
+          <li><span class="k">서명 가능 기간 재설정</span>: 서명가능 시작·종료시점을 지정 (기본값: 발행일 00:00 ~ 23:59, 수정 가능)</li>
+          <li><span class="k">발송 대상 선택</span>: 미서명자만 선택 가능, 전체 선택 지원, 인원이 많으면 목록 영역 내 스크롤</li>
+          <li>서명 진행 중 건은 기존과 같이 <b>현재 URL로 재발송</b>, 완료 건은 알림톡 버튼 미노출</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="proto">
+    <div class="frame">
+      <div class="frame-bar"><i></i><i></i><i></i><div class="url">safenow.co.kr/mber/sfntask/attendmng/attend?scope=MY</div></div>
+      <div class="svc">
+        <aside class="svc-side">
+          <div class="svc-logo">안전NOW</div>
+          <div class="it on">서명관리</div>
+        </aside>
+        <div class="svc-main">
+          <h2 class="svc-title">서명관리</h2>
+          <div class="svc-card">
+            <div class="search"><input placeholder="전자서명으로 검색" id="q" oninput="E3.renderList()"><button aria-label="검색">⌕</button></div>
+            <table class="sl">
+              <thead><tr><th>전자서명</th><th>서명 가능 시간</th><th>참석자</th><th>서명상태</th><th>알림톡</th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 참석자 서명 현황 모달 -->
+        <div class="dim" id="dimP"><div class="modal" role="dialog" aria-modal="true">
+          <h3 id="pTitle"></h3><p class="sub" id="pPeriod"></p>
+          <div id="pAlert"></div>
+          <div class="seg" id="pSeg"></div>
+          <table class="pt"><thead><tr><th>순번</th><th>부서</th><th>이름</th><th>직위</th><th>서명 상태</th><th>서명일시</th></tr></thead><tbody id="pRows"></tbody></table>
+          <div class="m-actions"><button class="btn dark" onclick="E3.close('dimP')">닫기</button><button class="btn blue" onclick="E3.openUrl()">옴니채널 URL 확인</button></div>
+        </div></div>
+
+        <!-- 옴니채널 URL 모달 -->
+        <div class="dim" id="dimU"><div class="modal" role="dialog" aria-modal="true">
+          <h3>옴니채널 서명 URL</h3>
+          <div class="lbl">서명 가능 기간</div><div id="uPeriod" style="font-size:13px"></div>
+          <div class="lbl">옴니채널 URL <span id="uState"></span></div>
+          <div class="url-row"><input id="uUrl" readonly><button id="uCopy" onclick="E3.copy()">⧉ 복사</button></div>
+          <div id="uAlert"></div>
+          <div class="lbl">URL 발급 이력</div>
+          <table class="hist"><thead><tr><th>회차</th><th>발급일시</th><th>서명 가능 기간</th><th>상태</th></tr></thead><tbody id="uHist"></tbody></table>
+          <div class="m-actions"><button class="btn dark" onclick="E3.close('dimU')">닫기</button></div>
+        </div></div>
+
+        <!-- 재발송(진행중) 모달 -->
+        <div class="dim" id="dimS"><div class="modal" role="dialog" aria-modal="true" style="width:520px">
+          <h3>알림톡 재발송</h3><p class="sub">서명 가능 기간 내 건으로, <b>현재 URL</b>로 미서명자에게 재발송합니다.</p>
+          <div class="lbl">서명 가능 기간</div><div class="box" id="sPeriod"></div>
+          <div class="lbl"><span>발송 대상 <em>*</em></span><small>미서명자만 선택 가능</small></div>
+          <div class="targets" id="sTargets"></div>
+          <div class="m-actions"><button class="btn" onclick="E3.close('dimS')">취소</button><button class="btn blue" id="sBtn" onclick="E3.resend()">재발송</button></div>
+        </div></div>
+
+        <!-- URL 재발급 및 재발송 모달 (기간만료) -->
+        <div class="dim" id="dimR"><div class="modal" role="dialog" aria-modal="true" style="width:560px">
+          <h3>URL 재발급 및 재발송</h3>
+          <p class="sub">서명 가능 기간이 만료되어, 새 옴니채널 URL을 발급하고 미서명자에게 알림톡으로 재발송합니다.</p>
+          <div class="box" style="margin-top:16px">
+            <div>기존 <span class="old" id="rOld"></span> <span class="st exp">기간만료</span></div>
+          </div>
+          <div class="dt2">
+            <div><div class="lbl"><span>서명가능 시작시점 <em>*</em></span></div><input type="datetime-local" class="dt" id="rStart"></div>
+            <div><div class="lbl"><span>서명가능 종료시점 <em>*</em></span></div><input type="datetime-local" class="dt" id="rEnd"></div>
+          </div>
+          <div class="dt-err hidden" id="rDtErr"></div>
+          <div class="lbl"><span>발송 대상 <em>*</em></span><small>미서명자만 선택 가능</small></div>
+          <div class="targets" id="rTargets"></div>
+          <div class="m-actions"><button class="btn" onclick="E3.close('dimR')">취소</button><button class="btn blue" id="rBtn" disabled onclick="E3.reissue()">URL 재발급 및 재발송</button></div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- 참석자 휴대폰 (알림톡 수신) -->
+    <div class="phone-wrap">
+      <div class="phone-cap"><span>윤재우 휴대폰 · 알림톡 예시</span></div>
+      <div class="ph-tabs" id="phTabs"></div>
+      <div class="phone"><div class="screen">
+        <div class="kk-head"><i>NOW</i>안전NOW</div>
+        <div class="kk-body" id="inbox"></div>
+        <div class="webview" id="wv">
+          <div class="wv-bar"><button onclick="E3.closeWv()" aria-label="닫기">‹</button><span id="wvUrl"></span></div>
+          <div class="wv-body" id="wvBody"></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</template>
+
+<script>
+/* =====================================================================
+   수정사항 레지스트리 — 신규 항목은 여기에 추가 (status: 기획중 | 기획완료 | 개발중 | 반영완료)
+===================================================================== */
+const EDITS = [
+  { id:'E-001', group:'사용자 · 업무관리', title:'서명관리 페이지 개선', short:'서명관리 페이지 개선',
+    status:'기획완료', date:'2026-10-01', tpl:'e003', init:()=>E3.init() },
+];
+const LAST_UPDATED = '2026-10-01';
+
+/* ===================== 공통 ===================== */
+const $ = (s,el=document)=>el.querySelector(s);
+const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const normNl = s => String(s ?? '').replace(/\r\n?/g,'\n').trim();
+const pad = n => String(n).padStart(2,'0');
+const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const D = s => new Date(s.replace(' ','T'));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400)}
+const statusBadge = s => ({기획중:'b-plan',기획완료:'b-plan',개발중:'b-dev',반영완료:'b-done'}[s]||'b-plan');
+
+let cur = { id:null };
+function renderGnb(){
+  const groups={}; EDITS.forEach(e=>(groups[e.group] ||= []).push(e));
+  let h=`<div class="gnb-sec"><a class="${cur.id==='HOME'?'on':''}" onclick="go('HOME')"><span class="no">ALL</span><span class="t">개요 · 전체 수정사항<small>${EDITS.length}건</small></span></a></div>`;
+  for(const [g,items] of Object.entries(groups))
+    h+=`<div class="gnb-sec"><h6>${esc(g)}</h6>`+items.map(e=>`<a class="${cur.id===e.id?'on':''}" onclick="go('${e.id}')"><span class="no">${e.id}</span><span class="t">${esc(e.short)}<small>${e.status} · ${e.date}</small></span></a>`).join('')+`</div>`;
+  $('#gnbList').innerHTML=h; $('#lastUpdated').textContent=LAST_UPDATED;
+}
+function go(id){
+  cur={id}; try{history.replaceState(null,'',`#${id}`)}catch(e){}
+  renderGnb();
+  if(id==='HOME') return renderHome();
+  const e=EDITS.find(x=>x.id===id);
+  $('#crumb').textContent=`${e.id} · ${e.group}`;
+  $('#pageTitle').innerHTML=`${esc(e.title)} <span class="badge ${statusBadge(e.status)}">${e.status}</span>`;
+  $('#pageMeta').innerHTML=`<span>등록일 ${e.date}</span>`;
+  $('#pageBody').innerHTML=''; $('#pageBody').appendChild($(`#tpl-${e.tpl}`).content.cloneNode(true));
+  e.init(); $('.main').scrollTop=0;
+}
+function renderHome(){
+  $('#crumb').textContent=''; $('#pageTitle').textContent='전체 수정사항'; $('#pageMeta').innerHTML=`<span>최종 업데이트 ${LAST_UPDATED}</span>`;
+  const c=s=>EDITS.filter(e=>e.status===s).length;
+  $('#pageBody').innerHTML=`<div class="ov-grid">
+    <div class="stat"><small>기획중</small><b>${c('기획중')}<span>건</span></b></div>
+    <div class="stat"><small>기획완료</small><b>${c('기획완료')}<span>건</span></b></div>
+    <div class="stat"><small>개발중</small><b>${c('개발중')}<span>건</span></b></div>
+    <div class="stat"><small>반영완료</small><b>${c('반영완료')}<span>건</span></b></div></div>
+    <div class="doc"><table class="tb"><tr><th>ID</th><th>구분</th><th>수정사항</th><th>등록일</th><th>상태</th></tr>
+    ${EDITS.map(e=>`<tr><td>${e.id}</td><td>${esc(e.group)}</td><td><span class="link" onclick="go('${e.id}')">${esc(e.title)}</span></td><td>${e.date}</td><td><span class="badge ${statusBadge(e.status)}">${e.status}</span></td></tr>`).join('')}</table></div>`;
+}
+
+/* ===================== E-001 서명관리 ===================== */
+const PEOPLE = {
+  '윤재우':{dept:'관리부서',pos:'이사',role:'안전관리책임자',tel:'010-****-4821'},
+  '김현수':{dept:'공무팀',pos:'대리',tel:'010-****-1937'},
+  '이지은':{dept:'안전팀',pos:'주임',tel:'010-****-5502'},
+  '박민준':{dept:'공무팀',pos:'사원'}, '최서연':{dept:'안전팀',pos:'대리'}, '정우진':{dept:'시공팀',pos:'과장'},
+  '강하늘':{dept:'시공팀',pos:'대리'}, '조은비':{dept:'품질팀',pos:'주임'}, '윤도현':{dept:'시공팀',pos:'사원'},
+  '장수민':{dept:'설비팀',pos:'대리'}, '임재혁':{dept:'설비팀',pos:'사원'}, '한지호':{dept:'안전팀',pos:'사원'},
+};
+const token = () => { const b=new Uint8Array(32); crypto.getRandomValues(b); return btoa(String.fromCharCode(...b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); };
+const signUrl = t => `https://safenow.co.kr/at_sign?token=${t}`;
+
+const E3 = {
+  rows:null, msgs:[], openId:null, pFilter:'ALL', seenWho:'윤재우', phTab:'exp', expRow:5,
+  seed(){
+    const R=(id,title,s,e,ps,signed=[])=>{
+      const r={id,comp:'(주)안전건설',title,ps,signed:{},urls:[{v:1,token:token(),issuedAt:D(s),start:D(s),end:D(e)}]};
+      signed.forEach(n=>r.signed[n]={at:new Date(D(s).getTime()+3*3600e3),v:1});
+      ps.filter(p=>p==='윤재우').forEach(p=>E3.msgs.push({to:p,rowId:id,kind:'init',t:r.urls[0].issuedAt,tk:r.urls[0].token,start:r.urls[0].start,end:r.urls[0].end}));
+      return r;
+    };
+    E3.rows=[
+      R(1,'안전보건교육 서명','2026-10-01 00:00','2026-10-31 23:59',['윤재우','김현수']),
+      R(2,'TBM 참석자 서명','2026-10-01 00:00','2026-10-02 23:59',['윤재우','김현수'],['김현수']),
+      R(3,'TBM 참석자 서명','2026-09-28 00:00','2026-09-29 23:59',['윤재우'],['윤재우']),
+      R(9,'안전보건교육 서명','2026-09-15 00:00','2026-09-16 23:59',['윤재우','김현수','이지은','박민준','최서연','정우진','강하늘','조은비','윤도현','장수민','임재혁','한지호'],['김현수','정우진','조은비']),
+      R(4,'TBM 참석자 서명','2026-08-27 00:00','2026-08-28 23:59',['윤재우'],['윤재우']),
+      R(5,'TBM 참석자 서명','2026-08-19 00:00','2026-08-20 23:59',['윤재우']),
+      R(6,'TBM 참석자 서명','2026-08-13 00:00','2026-08-14 23:59',['윤재우']),
+      R(7,'TBM 참석자 서명','2026-08-14 00:00','2026-08-15 23:59',['윤재우','김현수','이지은'],['김현수']),
+      R(8,'TBM 참석자 서명','2026-08-11 00:00','2026-08-12 23:59',['윤재우','김현수','이지은']),
+    ];
+  },
+  init(){
+    if(!E3.rows) E3.seed();
+    E3.renderList(); E3.renderPhone();
+    $('#rStart').oninput=$('#rEnd').oninput=E3.validR;
+    $$('.dim').forEach(d=>d.onclick=e=>{ if(e.target===d) d.classList.remove('show'); });
+  },
+  row:id=>E3.rows.find(r=>r.id===id),
+  curUrl:r=>r.urls[r.urls.length-1],
+  unsigned:r=>r.ps.filter(p=>!r.signed[p]),
+  status(r){ if(!E3.unsigned(r).length) return 'done'; return new Date()>E3.curUrl(r).end ? 'exp' : 'ing'; },
+  stLabel:s=>({ing:'서명함',done:'완료',exp:'기간만료'}[s]),
+
+  renderList(){
+    const q=($('#q')?.value||'').trim();
+    $('#rows').innerHTML=E3.rows.filter(r=>!q||r.title.includes(q)).map(r=>{
+      const s=E3.status(r), u=E3.curUrl(r), re=r.urls.length-1;
+      const per=`${fmt(u.start)} ~ ${fmt(u.end)}`;
+      return `<tr class="click" id="row${r.id}" onclick="E3.openP(${r.id})">
+        <td class="l"><span class="comp">${r.comp}</span>${esc(r.title)}${re?`<span class="rtag">재발급 ${re}회</span>`:''}</td>
+        <td class="period">${per}${re?`<small>${fmt(r.urls[0].start)} ~ ${fmt(r.urls[0].end)}</small>`:''}</td>
+        <td>${r.ps[0]}${r.ps.length>1?` 외 ${r.ps.length-1}명`:''}</td>
+        <td><span class="st ${s}">${E3.stLabel(s)}</span></td>
+        <td>${s==='done'?'':`<button class="at-btn" onclick="event.stopPropagation();E3.alimtalk(${r.id})" aria-label="알림톡">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></button>`}</td></tr>`;
+    }).join('');
+  },
+  flash(id){ const tr=$('#row'+id); if(tr){tr.classList.remove('flash');void tr.offsetWidth;tr.classList.add('flash');} },
+  open(id){ $('#'+id).classList.add('show'); },
+  close(id){ $('#'+id).classList.remove('show'); },
+
+  /* 알림톡 버튼 분기 */
+  alimtalk(id){
+    const r=E3.row(id), s=E3.status(r); E3.openId=id;
+    if(s==='done') return toast('모든 참석자가 서명을 완료했습니다.');
+    if(s==='ing') return E3.openS();
+    E3.openR();
+  },
+  targetsHtml(r, name){
+    const un=E3.unsigned(r).length;
+    return `<div class="tg-head"><label><input type="checkbox" data-all="${name}" checked> 전체 선택</label>
+        <span class="cnt">선택 <b data-cnt="${name}">${un}</b>명 / 미서명 ${un}명 · 전체 ${r.ps.length}명</span></div>
+      <div class="tg-wrap"><div class="tg-list">` + r.ps.map(p=>{
+        const done=!!r.signed[p];
+        return `<label class="${done?'dis':''}"><input type="checkbox" name="${name}" value="${p}" ${done?'disabled':'checked'}> ${p} <span style="color:var(--muted)">${PEOPLE[p].dept} · ${PEOPLE[p].pos}</span>${done?'<span class="ph">서명 완료</span>':''}</label>`;
+      }).join('') + `</div></div>`;
+  },
+  bindTargets(box, name, cb){
+    const all=$(`[data-all=${name}]`,box), items=$$(`input[name=${name}]:not(:disabled)`,box);
+    const list=$('.tg-list',box), wrap=$('.tg-wrap',box);
+    const upd=()=>{ $(`[data-cnt=${name}]`,box).textContent=items.filter(x=>x.checked).length; cb(); };
+    const fade=()=>wrap.classList.toggle('more', list.scrollHeight-list.scrollTop-list.clientHeight>2);
+    list.onscroll=fade; requestAnimationFrame(fade);
+    all.onchange=()=>{ items.forEach(i=>i.checked=all.checked); upd(); };
+    items.forEach(i=>i.onchange=()=>{ all.checked=items.every(x=>x.checked); upd(); });
+  },
+  picked:name=>$$(`input[name=${name}]:checked`).map(i=>i.value),
+  openS(){
+    const r=E3.row(E3.openId), u=E3.curUrl(r);
+    $('#sPeriod').textContent=`${fmt(u.start)} ~ ${fmt(u.end)}`;
+    $('#sTargets').innerHTML=E3.targetsHtml(r,'sT');
+    E3.bindTargets($('#sTargets'),'sT',()=>$('#sBtn').disabled=!E3.picked('sT').length);
+    $('#sBtn').disabled=false; E3.open('dimS');
+  },
+  resend(){
+    const r=E3.row(E3.openId), u=E3.curUrl(r), to=E3.picked('sT'), t=new Date();
+    to.forEach(p=>E3.msgs.push({to:p,rowId:r.id,kind:'resend',t,tk:u.token,start:u.start,end:u.end}));
+    E3.close('dimS'); toast(`${to.length}명에게 현재 URL로 알림톡을 재발송했습니다.`); E3.renderPhone();
+  },
+
+  /* 재발급 */
+  dtVal:d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`,
+  dtGet:id=>{ const v=$(id).value; return v?new Date(v):null; },
+  openR(){
+    const r=E3.row(E3.openId), u=E3.curUrl(r);
+    $('#rOld').textContent=`${fmt(u.start)} ~ ${fmt(u.end)}`;
+    $('#rTargets').innerHTML=E3.targetsHtml(r,'rT');
+    E3.bindTargets($('#rTargets'),'rT',E3.validR);
+    const s=new Date(); s.setHours(0,0,0,0); const e=new Date(); e.setHours(23,59,0,0);   // 기본: 발행일 00:00 ~ 23:59 (수정 가능)
+    $('#rStart').value=E3.dtVal(s); $('#rEnd').value=E3.dtVal(e);
+    E3.validR(); E3.open('dimR');
+  },
+  validR(){
+    const s=E3.dtGet('#rStart'), e=E3.dtGet('#rEnd'); let msg='';
+    if(!s||!e) msg='서명가능 시작시점과 종료시점을 입력하세요.';
+    else if(e<=s) msg='종료시점은 시작시점 이후여야 합니다.';
+    else if(e<=new Date()) msg='종료시점은 현재 시각 이후여야 합니다.';
+    $('#rDtErr').textContent=msg; $('#rDtErr').classList.toggle('hidden',!msg);
+    $('#rEnd').classList.toggle('err',!!msg && !!s && !!e); 
+    $('#rBtn').disabled = !!msg || !E3.picked('rT').length;
+  },
+  reissue(){
+    const r=E3.row(E3.openId), t=new Date(), to=E3.picked('rT');
+    const u={v:r.urls.length+1,token:token(),issuedAt:t,start:E3.dtGet('#rStart'),end:E3.dtGet('#rEnd')};
+    r.urls.push(u);                                   // 이전 토큰은 current가 아니므로 즉시 무효
+    to.forEach(p=>E3.msgs.push({to:p,rowId:r.id,kind:'reissue',t,tk:u.token,start:u.start,end:u.end}));
+    E3.close('dimR'); E3.renderList(); E3.flash(r.id);
+    if(to.includes('윤재우')){ E3.expRow=r.id; E3.phTab='exp'; }
+    E3.renderPhone();
+    if($('#dimP').classList.contains('show')) E3.openP(r.id);
+    toast(`URL 재발급 및 재발송이 완료되었습니다. (${to.length}명)`);
+  },
+
+  /* 참석자 모달 */
+  openP(id){
+    E3.openId=id; const r=E3.row(id), u=E3.curUrl(r), s=E3.status(r), re=r.urls.length-1;
+    $('#pTitle').innerHTML=`${esc(r.title)} ${re?`<span class="rtag">재발급 ${re}회</span>`:''}`;
+    $('#pPeriod').textContent=`📅 ${fmt(u.start)} ~ ${fmt(u.end)}`;
+    $('#pAlert').innerHTML = s==='exp'
+      ? `<div class="alert warn"><span>⚠</span><div class="grow">서명 가능 기간이 만료되었습니다. 미서명자 ${E3.unsigned(r).length}명</div><button class="btn sm blue" onclick="E3.openR()">URL 재발급 및 재발송</button></div>` : '';
+    E3.renderP(); E3.open('dimP');
+  },
+  renderP(){
+    const r=E3.row(E3.openId), done=r.ps.filter(p=>r.signed[p]), un=E3.unsigned(r);
+    const segs=[['ALL','전체',r.ps.length],['DONE','완료',done.length],['UN','미완료',un.length]];
+    $('#pSeg').innerHTML=segs.map(([k,l,n])=>`<button class="${E3.pFilter===k?'on':''}" onclick="E3.pFilter='${k}';E3.renderP()">${l}<b>${n}</b></button>`).join('');
+    const list = E3.pFilter==='DONE'?done:E3.pFilter==='UN'?un:r.ps;
+    $('#pRows').innerHTML = list.map((p,i)=>{ const P=PEOPLE[p], sg=r.signed[p];
+      return `<tr><td>${i+1}</td><td>${P.dept}</td><td>${p}</td><td>${P.pos}${P.role?`<span class="ptag">${P.role}</span>`:''}</td>
+        <td><span class="st ${sg?'done':'no'}">${sg?'완료':'미완료'}</span></td>
+        <td>${sg?fmt(sg.at)+(sg.v>1?`<span class="rtag">연장 서명</span>`:''):'-'}</td></tr>`; }).join('')
+      || `<tr><td colspan="6" style="color:var(--muted);padding:30px">해당 참석자가 없습니다.</td></tr>`;
+  },
+
+  /* URL 모달 */
+  openUrl(){
+    const r=E3.row(E3.openId), u=E3.curUrl(r), s=E3.status(r), exp=s==='exp';
+    $('#uPeriod').innerHTML=`${fmt(u.start)}:00 ~ ${fmt(u.end)}:00 ${exp?'<span class="st exp">기간만료</span>':''}`;
+    $('#uUrl').value=signUrl(u.token); $('#uUrl').disabled=exp; $('#uCopy').disabled=exp;
+    $('#uState').innerHTML = r.urls.length>1 ? `<span class="rtag">${u.v}차 발급</span>` : '';
+    $('#uAlert').innerHTML = exp
+      ? `<div class="alert warn"><span>⚠</span><div class="grow">만료된 URL입니다. 새 URL을 발급해야 서명할 수 있습니다.</div><button class="btn sm blue" onclick="E3.close('dimU');E3.openR()">URL 재발급 및 재발송</button></div>`
+      : `<div class="alert info">ⓘ 이 URL을 사용하여 로그인 없이 서명할 수 있습니다.</div>`;
+    $('#uHist').innerHTML=[...r.urls].reverse().map(x=>{
+      const isCur=x===u, st = !isCur ? '<span class="st exp">폐기</span>' : exp ? '<span class="st exp">기간만료</span>' : '<span class="st ing">사용 중</span>';
+      return `<tr><td>${x.v}차</td><td>${fmt(x.issuedAt)}</td><td>${fmt(x.start)} ~ ${fmt(x.end)}</td><td>${st}</td></tr>`;
+    }).join('');
+    E3.open('dimU');
+  },
+  copy(){ const v=$('#uUrl').value; (navigator.clipboard?.writeText(v)||Promise.reject()).then(()=>toast('URL을 복사했습니다.'),()=>toast('URL을 복사했습니다.')); },
+
+  /* 휴대폰 */
+  renderPhone(){
+    E3.closeWv();
+    const TABS=[['exp','기간 만료',E3.expRow],['done','서명 완료',3],['ing','서명 가능',1]];
+    $('#phTabs').innerHTML=TABS.map(([k,l])=>`<button class="${E3.phTab===k?'on':''}" onclick="E3.phTab='${k}';E3.renderPhone()">${l}</button>`).join('');
+    const rowId=TABS.find(t=>t[0]===E3.phTab)[2];
+    const mine=E3.msgs.filter(m=>m.to==='윤재우' && m.rowId===rowId).sort((a,b)=>a.t-b.t);
+    const list=mine.slice(-1);                                    // 상황별 최신 알림톡 1건만 노출
+    $('#inbox').innerHTML=list.map(m=>{
+      const prev=[...mine].reverse().find(x=>x.rowId===m.rowId && x.tk!==m.tk);   // 재발급 전 링크(만료 확인용)
+      const r=E3.row(m.rowId), live = E3.curUrl(r).token===m.tk;
+      const head={init:'서명 요청',resend:'서명 요청 (재안내)',reissue:'서명 기간 연장 안내'}[m.kind];
+      const body = m.kind==='reissue'
+        ? `${m.to}님, ${r.comp} '${r.title}'의 서명 기간이 연장되었습니다.\n\n■ 서명 기간\n${fmt(m.start)} ~ ${fmt(m.end)}\n\n※ 이전에 받은 링크는 더 이상 사용할 수 없습니다.`
+        : `${m.to}님, ${r.comp} '${r.title}'에 서명해 주세요.\n\n■ 서명 기간\n${fmt(m.start)} ~ ${fmt(m.end)}`;
+      return `<div class="kk-time">${fmt(m.t)}</div>
+        <div class="kk-msg ${live?'':'dead'}"><div class="hd">알림톡 도착 · ${head}</div><div class="bd">${esc(body)}</div>
+        <div class="ft"><button onclick="E3.tap('${m.tk}',${m.rowId})">서명하기</button><small>${signUrl(m.tk)}</small></div></div>
+        ${prev?`<div class="kk-prev"><a onclick="E3.tap('${prev.tk}',${prev.rowId})">이전에 받은 링크로 접속해보기 →</a></div>`:''}`;
+    }).join('') || `<div class="kk-time">수신한 알림톡이 없습니다.</div>`;
+    const ib=$('#inbox'); ib.scrollTop=ib.scrollHeight;
+  },
+  closeWv(){ $('#wv')?.classList.remove('show'); },
+  tap(tk,rowId){
+    const r=E3.row(rowId), u=E3.curUrl(r), who=E3.seenWho, wb=$('#wvBody');
+    $('#wvUrl').textContent=signUrl(tk); $('#wv').classList.add('show');
+    const res=(ok,t,d)=>wb.innerHTML=`<div class="res"><div class="ic ${ok?'ok':'err'}">${ok?'✓':'!'}</div><h5>${t}</h5><p class="muted">${d}</p></div>`;
+    if(u.token!==tk) return res(false,'유효하지 않은 서명 링크입니다','서명 링크가 새로 발급되었습니다.<br>가장 최근에 받은 알림톡의 링크로 서명해 주세요.');
+    if(r.signed[who]) return res(true,'이미 서명을 완료했습니다',`서명일시 ${fmt(r.signed[who].at)}`);
+    if(new Date()>u.end) return res(false,'서명 가능 기간이 만료되었습니다','담당자에게 서명 링크 재발송을 요청해 주세요.');
+    if(new Date()<u.start) return res(false,'아직 서명 가능 기간이 아닙니다',`서명 가능 기간: ${fmt(u.start)} ~ ${fmt(u.end)}`);
+    wb.innerHTML=`<h5>${esc(r.title)}</h5><div class="muted">${r.comp} · 서명 기간 ${fmt(u.start)} ~ ${fmt(u.end)}</div>
+      ${u.v>1?`<div class="alert warn" style="margin-top:10px;font-size:12px">기간 연장(${u.v}차 발급) 서명으로 기록됩니다.</div>`:''}
+      <div style="margin-top:14px;font-size:13px"><b>${who}</b> · ${PEOPLE[who].dept} ${PEOPLE[who].pos}</div>
+      <canvas class="pad" id="pad"></canvas>
+      <div style="display:flex;gap:6px"><button class="btn sm" onclick="E3.pad.clear()">지우기</button><button class="btn blue" style="flex:1" id="padOk" disabled onclick="E3.submitSign('${tk}',${rowId})">서명 제출</button></div>`;
+    E3.pad.init($('#pad'));
+  },
+  submitSign(tk,rowId){
+    const r=E3.row(rowId), u=E3.curUrl(r);
+    if(u.token!==tk || new Date()>u.end || new Date()<u.start) return toast('유효하지 않은 링크입니다.');   // 서버 재검증 가정
+    r.signed[E3.seenWho]={at:new Date(),v:u.v};
+    $('#wvBody').innerHTML=`<div class="res"><div class="ic ok">✓</div><h5>서명이 완료되었습니다</h5><p class="muted">${fmt(new Date())}${u.v>1?'<br>기간 연장 서명으로 기록되었습니다.':''}</p></div>`;
+    E3.renderList(); E3.flash(rowId); E3.renderPhone(); $('#wv').classList.add('show');
+    if($('#dimP').classList.contains('show') && E3.openId===rowId) E3.openP(rowId);
+  },
+  pad:{
+    init(c){
+      const r=c.getBoundingClientRect(); c.width=r.width*2; c.height=r.height*2;
+      const x=c.getContext('2d'); x.scale(2,2); x.lineWidth=2.4; x.lineCap='round'; x.strokeStyle='#111';
+      let on=false; this.c=c; this.x=x;
+      const p=e=>{const b=c.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
+      c.onpointerdown=e=>{on=true;c.setPointerCapture(e.pointerId);x.beginPath();x.moveTo(...p(e));};
+      c.onpointermove=e=>{if(!on)return;x.lineTo(...p(e));x.stroke();$('#padOk').disabled=false;};
+      c.onpointerup=()=>on=false;
+    },
+    clear(){ this.x.clearRect(0,0,this.c.width,this.c.height); $('#padOk').disabled=true; },
+  },
+};
+
+/* 부트 */
+(function(){
+  const id=(location.hash||'').slice(1);
+  go(id==='HOME'||EDITS.some(e=>e.id===id)?id:EDITS[0].id);
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') $$('.dim.show').forEach(d=>d.classList.remove('show')); });
+})();
+</script>
+</body>
+</html>
